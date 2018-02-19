@@ -6,7 +6,6 @@ import java.util.Scanner;
 public class Perception {
 	public static final int NUM_DATA_POINTS = 15;
 	public static final String INPUT_FILENAME = "ai_data.txt";
-	public static double scaleFactor = 1;
 	
 	public static int getValue(String value) {
 		return Integer.parseInt(value.substring(value.indexOf(':')+1));
@@ -17,8 +16,7 @@ public class Perception {
 		try {
 			lineScan = new Scanner(new File("./"+INPUT_FILENAME));
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new IllegalArgumentException("File not Found");
 		}
 		String line;
 		Scanner valueScan;
@@ -84,14 +82,6 @@ public class Perception {
 		getInput(frenchData, englishData);
 		scaleData(frenchData, englishData);
 		
-//		for(int i = 0; i < frenchData[0].length; i++) {
-//			System.out.println(frenchData[0][i]+"    "+frenchData[1][i]);
-//		}
-//		System.out.println("\n");
-//		for(int i = 0; i < englishData[0].length; i++) {
-//			System.out.println(englishData[0][i]+"    "+englishData[1][i]);
-//		}
-		
 		Random gen = new Random();
 		int count = 0;
 		while(count < iterations) {
@@ -100,12 +90,10 @@ public class Perception {
 			double[][] dataSet = (language == 0)? frenchData: englishData;
 			int dataPoint = gen.nextInt(NUM_DATA_POINTS);
 			double[] x = {1, dataSet[0][dataPoint]};
-			boolean misclassified = false;
+
 			for(int i = 0; i < w.length; i++) {
 				double changeBy = alpha*(language-threshold(dataSet[0][dataPoint], dataSet[1][dataPoint], w))*x[i];
 				w[i] = w[i] + changeBy;
-				if(changeBy != 0)
-					misclassified = true;
 			}
 			count++;
 			

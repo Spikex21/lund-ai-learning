@@ -6,7 +6,6 @@ import java.util.Scanner;
 public class LogisticRegression {
 	public static final int NUM_DATA_POINTS = 15;
 	public static final String INPUT_FILENAME = "ai_data.txt";
-	public static double scaleFactor = 1;
 	
 	public static int getValue(String value) {
 		return Integer.parseInt(value.substring(value.indexOf(':')+1));
@@ -17,8 +16,7 @@ public class LogisticRegression {
 		try {
 			lineScan = new Scanner(new File("./"+INPUT_FILENAME));
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new IllegalArgumentException("File not Found");
 		}
 		String line;
 		Scanner valueScan;
@@ -81,14 +79,6 @@ public class LogisticRegression {
 		getInput(frenchData, englishData);
 		scaleData(frenchData, englishData);
 		
-//		for(int i = 0; i < frenchData[0].length; i++) {
-//			System.out.println(frenchData[0][i]+"    "+frenchData[1][i]);
-//		}
-//		System.out.println("\n");
-//		for(int i = 0; i < englishData[0].length; i++) {
-//			System.out.println(englishData[0][i]+"    "+englishData[1][i]);
-//		}
-		
 		Random gen = new Random();
 		int count = 0;
 		while(count < iterations) {
@@ -102,7 +92,7 @@ public class LogisticRegression {
 				change = threshold(dataSet[0][dataPoint], dataSet[1][dataPoint], w);
 				w[i] += alpha*(language-change)*x[i];
 			}
-			System.out.println(change + " |   "+"y = "+w[0]+" + " + w[1]+"x");
+			//System.out.println(change + " |   "+"y = "+w[0]+" + " + w[1]+"x");
 			count++;
 			
 			
