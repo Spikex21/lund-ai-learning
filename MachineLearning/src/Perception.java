@@ -75,7 +75,7 @@ public class Perception {
 		double[][] frenchData = new double[2][NUM_DATA_POINTS];
 		double[][] englishData= new double[2][NUM_DATA_POINTS];
 		
-		double[] w = {0,.1};	//default line {b=0,m=1}
+		double[] w = {0,.1};	//default line {b=0,m=.1}
 		final double alpha = .00001;
 		final double iterations = 100000;
 		

@@ -65,16 +65,16 @@ public class LogisticRegression {
 	}
 	
 	public static double threshold(double x, double y, double[] w) {
-		return (1.0/(1+Math.pow(Math.E,-(w[0]+w[1]*x))));
+		return (1.0/(1+Math.pow(Math.E,-(w[0]+w[1]*x-y)))); 	/*"-z" or "-w(dot)x" is represented here by -(w[0]+w[1]*x-y). */
 	}
 	
 	public static void main(String[] args) {
 		double[][] frenchData = new double[2][NUM_DATA_POINTS];
 		double[][] englishData= new double[2][NUM_DATA_POINTS];
 		
-		double[] w = {0,1};	//default line {b=0,m=1}
-		final double alpha = .01;
-		final double iterations = 10000;
+		double[] w = {0,.1};	//default line {b=0,m=.1}
+		final double alpha = .0002;
+		final double iterations = 1000000;
 		
 		getInput(frenchData, englishData);
 		scaleData(frenchData, englishData);
@@ -92,7 +92,7 @@ public class LogisticRegression {
 				change = threshold(dataSet[0][dataPoint], dataSet[1][dataPoint], w);
 				w[i] += alpha*(language-change)*change*(1-change)*x[i];
 			}
-			//System.out.println(change + " |   "+"y = "+w[0]+" + " + w[1]+"x");
+			System.out.println(change + " |   "+"y = "+w[0]+" + " + w[1]+"x");
 			count++;
 			
 			
