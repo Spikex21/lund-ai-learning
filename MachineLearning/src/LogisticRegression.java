@@ -90,7 +90,7 @@ public class LogisticRegression {
 			double change = 0;
 			for(int i = 0; i < w.length; i++) {
 				change = threshold(dataSet[0][dataPoint], dataSet[1][dataPoint], w);
-				w[i] += alpha*(language-change)*x[i];
+				w[i] += alpha*(language-change)*change*(1-change)*x[i];
 			}
 			//System.out.println(change + " |   "+"y = "+w[0]+" + " + w[1]+"x");
 			count++;
