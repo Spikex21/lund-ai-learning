@@ -78,7 +78,7 @@ public class LogisticRegression {
 		}
 	}
 	
-	public static double logistic(double[] x, double y, double[] w) {
+	public static double logistic(double[] x, double[] w) {
 		double alpha = -1000;
 		return (1.0/(1+Math.pow(Math.E,alpha*(dot(x,w))))); 	/*"-z" or "-w(dot)x" is represented here by (w[0]+w[1]*x-y). 
 															 * The sign is reversed because 0 should correspond to french which lies on top of the dividing line				
@@ -107,7 +107,7 @@ public class LogisticRegression {
 			double[] x = {1, dataSet[0][dataPoint], dataSet[1][dataPoint]};
 			double change = 0;
 			for(int i = 0; i < w.length; i++) {
-				change = logistic(x, dataSet[1][dataPoint], w);
+				change = logistic(x, w);
 				w[i] += alpha*(language-change)*x[i];
 			}
 //			System.out.print("x: "+ round(x[1]) +" | y:" + round(dataSet[1][dataPoint])+ " | ");
