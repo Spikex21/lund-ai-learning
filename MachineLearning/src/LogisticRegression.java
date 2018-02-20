@@ -11,6 +11,18 @@ public class LogisticRegression {
 		d*=100000;
 		return ((int)d)/100000.0;
 	}
+	
+	public static double dot(double[] x, double[] y) {
+		if(x.length != y.length) {
+			throw new IllegalArgumentException("Both vectors must be the same length in order to find their dot product");
+		}
+		double result = 0;
+		for(int i = 0; i < x.length; i++) {
+			result += x[i]*y[i];
+		}
+		return result;
+	}
+	
 	public static int getValue(String value) {
 		return Integer.parseInt(value.substring(value.indexOf(':')+1));
 	}
@@ -68,7 +80,7 @@ public class LogisticRegression {
 	
 	public static double logistic(double[] x, double y, double[] w) {
 		double alpha = -1000;
-		return (1.0/(1+Math.pow(Math.E,alpha*(w[0]*x[0]+w[1]*x[1]-y)))); 	/*"-z" or "-w(dot)x" is represented here by (w[0]+w[1]*x-y). 
+		return (1.0/(1+Math.pow(Math.E,alpha*(dot(x,w))))); 	/*"-z" or "-w(dot)x" is represented here by (w[0]+w[1]*x-y). 
 															 * The sign is reversed because 0 should correspond to french which lies on top of the dividing line				
 		 													*/
 	}
@@ -77,7 +89,7 @@ public class LogisticRegression {
 		double[][] frenchData = new double[2][NUM_DATA_POINTS];
 		double[][] englishData= new double[2][NUM_DATA_POINTS];
 		
-		double[] w = {0,.1};	//default line {b=0,m=.1}
+		double[] w = {0,.1, -1};	//default line {b=0,m=.1}
 		final double alpha = .0001;
 		final double iterations = 100000;
 		
@@ -90,21 +102,21 @@ public class LogisticRegression {
 			
 			int language = gen.nextInt(2); //0 for french, 1 for english
 			double[][] dataSet = (language == 0)? frenchData: englishData;
-			System.out.print(language +"| ");
+//			System.out.print(language +"| ");
 			int dataPoint = gen.nextInt(NUM_DATA_POINTS);
-			double[] x = {1, dataSet[0][dataPoint]};
+			double[] x = {1, dataSet[0][dataPoint], dataSet[1][dataPoint]};
 			double change = 0;
 			for(int i = 0; i < w.length; i++) {
 				change = logistic(x, dataSet[1][dataPoint], w);
 				w[i] += alpha*(language-change)*x[i];
 			}
-			System.out.print("x: "+ round(x[1]) +" | y:" + round(dataSet[1][dataPoint])+ " | ");
-			System.out.println(change + "| "+"y = "+ round(w[0])+" + " + round(w[1])+"x");
+//			System.out.print("x: "+ round(x[1]) +" | y:" + round(dataSet[1][dataPoint])+ " | ");
+//			System.out.println(change + "| "+"y = "+ round(w[0])+" + " + round(w[1])+"x");
 			count++;
-			
-			
+
 		}
 		System.out.println("y = "+w[0]+" + " + w[1]+"x");
+		System.out.println(w[0] + " + " + w[1] + "x1 + "+ w[2] + "x2");
 		
 
 	}
