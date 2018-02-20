@@ -81,19 +81,29 @@ public class Perception {
 		
 		Random gen = new Random();
 		int count = 0;
-		while(count < iterations) {
-			
+		int numCorrect = 0;
+		int finalCorrect = 1000;
+		
+		do {
 			int language = gen.nextInt(2); //0 for french, 1 for english
 			double[][] dataSet = (language == 0)? frenchData: englishData;
 			int dataPoint = gen.nextInt(NUM_DATA_POINTS);
 			double[] x = {1, dataSet[0][dataPoint]};
 
-			for(int i = 0; i < w.length; i++) {
-				double changeBy = alpha*(language-threshold(x, dataSet[1][dataPoint], w))*x[i];
+			int thresholdVal = threshold(x, dataSet[1][dataPoint], w);
+
+			if (language - thresholdVal == 0) {
+				numCorrect++;
+			} else {
+				numCorrect = 0;
+			}
+			
+			for(int i = 0; i < w.length; i++) {				
+				double changeBy = alpha*(language-thresholdVal)*x[i];
 				w[i] = w[i] + changeBy;
 			}
-			count++;
-		}
+
+		}while (numCorrect < finalCorrect);
 		System.out.println("y = "+w[0]+" + " + w[1]+"x");
 	}
 }
