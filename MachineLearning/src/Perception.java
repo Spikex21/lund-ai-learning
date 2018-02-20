@@ -104,6 +104,19 @@ public class Perception {
 			}
 
 		}while (numCorrect < finalCorrect);
+		
+		int n = 0;
+		for (int i = 0; i < 15; i++) {
+			if (w[0] + frenchData[0][i] * w[1] + frenchData[1][i] * w[2] < 0) {
+				n++;
+			}
+			
+			if (w[0] + englishData[0][i] * w[1] + englishData[1][i] * w[2] >= 0) {
+				n++;
+			}
+		}
+		
+		
 		System.out.println("y = "+w[0]+" + " + w[1]+"x");
 	}
 }

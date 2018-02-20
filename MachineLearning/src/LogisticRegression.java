@@ -80,8 +80,8 @@ public class LogisticRegression {
 	}
 	
 	public static double logistic(double[] x, double[] w) {
-		double alpha = -1000;
-		return (1.0/(1+Math.pow(Math.E,alpha*(dot(x,w))))); 	/*"-z" or "-w(dot)x" is represented here by (w[0]+w[1]*x-y). 
+		double beta = -1000;
+		return (1.0/(1+Math.pow(Math.E,beta*(dot(x,w))))); 	/*"-z" or "-w(dot)x" is represented here by (w[0]+w[1]*x-y). 
 															 * The sign is reversed because 0 should correspond to french which lies on top of the dividing line				
 		 													*/
 	}
@@ -90,9 +90,11 @@ public class LogisticRegression {
 		double[][] frenchData = new double[2][NUM_DATA_POINTS];
 		double[][] englishData= new double[2][NUM_DATA_POINTS];
 		
-		double[] w = {0,.1, -1};	//default line {b=0,m=.1}
-		final double alpha = .0001;
-		final double iterations = 100000;
+		double[] w = {0,0,0};
+		final double alpha = .01;
+		final double epsilon = 1;
+		double loss = 10;
+		final double iterations = 10000;
 		
 		getInput(frenchData, englishData);
 		scaleData(frenchData, englishData, 100000, 100000);
@@ -105,21 +107,25 @@ public class LogisticRegression {
 			double[][] dataSet = (language == 0)? frenchData: englishData;
 //			System.out.print(language +"| ");
 			int dataPoint = gen.nextInt(NUM_DATA_POINTS);
+					
+			// Calculates average loss for all points
+			double prevLoss = loss;
+			loss = 0;
+		
+
 			double[] x = {1, dataSet[0][dataPoint], dataSet[1][dataPoint]};
 			double change = 0;
+			
 			for(int i = 0; i < w.length; i++) {
 				change = logistic(x, w);
 				w[i] += alpha*(language-change)*x[i];
 			}
-//			System.out.print("x: "+ round(x[1]) +" | y:" + round(dataSet[1][dataPoint])+ " | ");
-//			System.out.println(change + "| "+"y = "+ round(w[0])+" + " + round(w[1])+"x");
+
+			
+			//System.out.println("loss diff: " + (loss - prevLoss));
+			
 			count++;
-
 		}
-		System.out.println("y = "+w[0]+" + " + w[1]+"x");
-		System.out.println(w[0] + " + " + w[1] + "x1 + "+ w[2] + "x2");
-		
-
+		System.out.println("w = [" + w[0] + ", " + w[1] + ", " + w[2] + "]");
 	}
-
 }
