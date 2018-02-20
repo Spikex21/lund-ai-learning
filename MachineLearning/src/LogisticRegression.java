@@ -65,18 +65,18 @@ public class LogisticRegression {
 	}
 	
 	public static double threshold(double x, double y, double[] w) {
-		return (1.0/(1+Math.pow(Math.E,(w[0]+w[1]*x-y)))); 	/*"-z" or "-w(dot)x" is represented here by (w[0]+w[1]*x-y). 
-															 * The sign is reversed because 0 should corespond to french which lies on top of the dividing line				
-		 													*/
+		return (1.0/(1+Math.pow(Math.E,-(w[0]+w[1]*x+w[2]*y))));
 	}
 	
 	public static void main(String[] args) {
 		double[][] frenchData = new double[2][NUM_DATA_POINTS];
 		double[][] englishData= new double[2][NUM_DATA_POINTS];
 		
-		double[] w = {0,.1};	//default line {b=0,m=.1}
-		final double alpha = .00001;
-		final double iterations = 1000000;
+		double[] w = {0,0,0};
+		final double alpha = .01;
+		final double epsilon = 1;
+		double loss = 10;
+		final double iterations = 10000;
 		
 		getInput(frenchData, englishData);
 		scaleData(frenchData, englishData);
@@ -88,20 +88,39 @@ public class LogisticRegression {
 			int language = gen.nextInt(2); //0 for french, 1 for english
 			double[][] dataSet = (language == 0)? frenchData: englishData;
 			int dataPoint = gen.nextInt(NUM_DATA_POINTS);
-			double[] x = {1, dataSet[0][dataPoint]};
-			double change = 0;
-			for(int i = 0; i < w.length; i++) {
-				change = threshold(dataSet[0][dataPoint], dataSet[1][dataPoint], w);
-				w[i] += alpha*(language-change)*x[i];
+			double x = dataSet[0][dataPoint], y = dataSet[1][dataPoint];
+			
+			double change = threshold(x, y, w);
+			
+			w[0] += alpha * (language-change);
+			w[1] += alpha * (language-change) * x;
+			w[2] += alpha * (language-change) * y;
+					
+			// Calculates average loss for all points
+			double prevLoss = loss;
+			loss = 0;
+
+			double lossW1 = 0, lossW2 = 0;
+			
+			for (int i = 0; i < NUM_DATA_POINTS; i++) {
+				double frenchX = frenchData[0][i], frenchY = frenchData[1][i],
+						englishX = englishData[0][i], englishY = englishData[1][i];
+				
+				double	changeF = threshold(frenchX, frenchY, w), changeE = threshold(englishX, englishY, w),
+						frenchDiff = 0 - changeF, englishDiff = 1 - changeE;
+				
+				lossW1 += 
+			
+				lossW2 += 
+				
+				// averages loss
+				loss = Math.sqrt(Math.pow(lossW1, 2) + Math.pow(lossW2, 2));
 			}
-			System.out.println(change + " |   "+"y = "+w[0]+" + " + w[1]+"x");
+			
+			System.out.println("loss diff: " + (loss - prevLoss));
+			
 			count++;
-			
-			
 		}
-		System.out.println("y = "+w[0]+" + " + w[1]+"x");
-		
-
+		//System.out.println("w = [" + w[0] + ", " + w[1] + "]");
 	}
-
 }
