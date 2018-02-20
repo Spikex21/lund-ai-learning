@@ -129,7 +129,7 @@ public class Perceptron {
 			}
 		}
 				
-		//System.out.println("n = " + n);
+		System.out.println("n = " + n);
 		
 		System.out.println("w = [" + w[0] + ", " + w[1] + ", " + w[2] + "]");
 	}
