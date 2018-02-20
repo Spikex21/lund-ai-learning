@@ -44,28 +44,25 @@ public class Perception {
 		 valueScan.next();
 		 for(int i = 0; i < NUM_DATA_POINTS; i++)
 			 englishData[1][i] = getValue(valueScan.next());
-		  
 	}
 	
-	public static void scaleData(double[][] frenchData, double[][] englishData) {
-		double scaleFactorLetters = 100000;
-		double scaleFactorA = 100000;
+	public static void scaleData(double[][] frenchData, double[][] englishData, double scaleLetters, double scaleAs) {
 		for(int i = 0; i < frenchData[0].length; i++) {
-			frenchData[0][i] /= scaleFactorLetters;
+			frenchData[0][i] /= scaleLetters;
 		}
 		for(int i = 0; i < frenchData[1].length; i++) {
-			frenchData[1][i] /= scaleFactorA;
+			frenchData[1][i] /= scaleAs;
 		}
 		for(int i = 0; i < englishData[0].length; i++) {
-			englishData[0][i] /= scaleFactorLetters;
+			englishData[0][i] /= scaleLetters;
 		}
 		for(int i = 0; i < englishData[0].length; i++) {
-			englishData[1][i] /= scaleFactorA;
+			englishData[1][i] /= scaleAs;
 		}
 	}
 	
-	public static int threshold(double x, double y, double[] w) {
-		if(y > w[0]+w[1]*x)
+	public static int threshold(double[] x, double y, double[] w) {
+		if(y > w[0]*x[0]+w[1]*x[1])
 			return 0;
 		else
 			return 1;
@@ -80,7 +77,7 @@ public class Perception {
 		final double iterations = 100000;
 		
 		getInput(frenchData, englishData);
-		scaleData(frenchData, englishData);
+		scaleData(frenchData, englishData, 100000, 100000);
 		
 		Random gen = new Random();
 		int count = 0;
@@ -92,16 +89,11 @@ public class Perception {
 			double[] x = {1, dataSet[0][dataPoint]};
 
 			for(int i = 0; i < w.length; i++) {
-				double changeBy = alpha*(language-threshold(dataSet[0][dataPoint], dataSet[1][dataPoint], w))*x[i];
+				double changeBy = alpha*(language-threshold(x, dataSet[1][dataPoint], w))*x[i];
 				w[i] = w[i] + changeBy;
 			}
 			count++;
-			
-			
 		}
 		System.out.println("y = "+w[0]+" + " + w[1]+"x");
-		
-
 	}
-
 }

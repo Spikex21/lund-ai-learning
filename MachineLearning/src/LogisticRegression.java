@@ -7,6 +7,10 @@ public class LogisticRegression {
 	public static final int NUM_DATA_POINTS = 15;
 	public static final String INPUT_FILENAME = "ai_data.txt";
 	
+	public static double round(double d) {
+		d*=100000;
+		return ((int)d)/100000.0;
+	}
 	public static int getValue(String value) {
 		return Integer.parseInt(value.substring(value.indexOf(':')+1));
 	}
@@ -47,26 +51,25 @@ public class LogisticRegression {
 		  
 	}
 	
-	public static void scaleData(double[][] frenchData, double[][] englishData) {
-		double scaleFactorLetters = 100000;
-		double scaleFactorA = 100000;
+	public static void scaleData(double[][] frenchData, double[][] englishData, double scaleLetters, double scaleAs) {
 		for(int i = 0; i < frenchData[0].length; i++) {
-			frenchData[0][i] /= scaleFactorLetters;
+			frenchData[0][i] /= scaleLetters;
 		}
 		for(int i = 0; i < frenchData[1].length; i++) {
-			frenchData[1][i] /= scaleFactorA;
+			frenchData[1][i] /= scaleAs;
 		}
 		for(int i = 0; i < englishData[0].length; i++) {
-			englishData[0][i] /= scaleFactorLetters;
+			englishData[0][i] /= scaleLetters;
 		}
 		for(int i = 0; i < englishData[0].length; i++) {
-			englishData[1][i] /= scaleFactorA;
+			englishData[1][i] /= scaleAs;
 		}
 	}
 	
-	public static double threshold(double x, double y, double[] w) {
-		return (1.0/(1+Math.pow(Math.E,(w[0]+w[1]*x-y)))); 	/*"-z" or "-w(dot)x" is represented here by (w[0]+w[1]*x-y). 
-															 * The sign is reversed because 0 should corespond to french which lies on top of the dividing line				
+	public static double logistic(double[] x, double y, double[] w) {
+		double alpha = -1000;
+		return (1.0/(1+Math.pow(Math.E,alpha*(w[0]*x[0]+w[1]*x[1]-y)))); 	/*"-z" or "-w(dot)x" is represented here by (w[0]+w[1]*x-y). 
+															 * The sign is reversed because 0 should correspond to french which lies on top of the dividing line				
 		 													*/
 	}
 	
@@ -75,11 +78,11 @@ public class LogisticRegression {
 		double[][] englishData= new double[2][NUM_DATA_POINTS];
 		
 		double[] w = {0,.1};	//default line {b=0,m=.1}
-		final double alpha = .00001;
-		final double iterations = 1000000;
+		final double alpha = .0001;
+		final double iterations = 100000;
 		
 		getInput(frenchData, englishData);
-		scaleData(frenchData, englishData);
+		scaleData(frenchData, englishData, 100000, 100000);
 		
 		Random gen = new Random();
 		int count = 0;
@@ -87,14 +90,16 @@ public class LogisticRegression {
 			
 			int language = gen.nextInt(2); //0 for french, 1 for english
 			double[][] dataSet = (language == 0)? frenchData: englishData;
+			System.out.print(language +"| ");
 			int dataPoint = gen.nextInt(NUM_DATA_POINTS);
 			double[] x = {1, dataSet[0][dataPoint]};
 			double change = 0;
 			for(int i = 0; i < w.length; i++) {
-				change = threshold(dataSet[0][dataPoint], dataSet[1][dataPoint], w);
+				change = logistic(x, dataSet[1][dataPoint], w);
 				w[i] += alpha*(language-change)*x[i];
 			}
-			System.out.println(change + " |   "+"y = "+w[0]+" + " + w[1]+"x");
+			System.out.print("x: "+ round(x[1]) +" | y:" + round(dataSet[1][dataPoint])+ " | ");
+			System.out.println(change + "| "+"y = "+ round(w[0])+" + " + round(w[1])+"x");
 			count++;
 			
 			
