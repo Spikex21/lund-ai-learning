@@ -60,7 +60,8 @@ public class LogisticRegression {
 		 valueScan.next();
 		 for(int i = 0; i < NUM_DATA_POINTS; i++)
 			 englishData[1][i] = getValue(valueScan.next());
-		  
+		 valueScan.close();
+		 lineScan.close();
 	}
 	
 	public static void scaleData(double[][] frenchData, double[][] englishData, double scaleLetters, double scaleAs) {
