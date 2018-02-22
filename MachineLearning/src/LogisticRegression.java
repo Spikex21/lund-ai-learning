@@ -158,7 +158,7 @@ public class LogisticRegression {
 			//checking gradient
 			gradient = gradient(frenchData, englishData, w);
 		}
-		
+		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 		System.out.println("w = [" + w[0] + ", " + w[1] + ", " + w[2] + "]");
 		System.out.println("or...  y = " + -w[0]/w[2] + " + " + -w[1]/w[2] + "x");
 
