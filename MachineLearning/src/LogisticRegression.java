@@ -42,18 +42,21 @@ public class LogisticRegression {
 		 valueScan.next();
 		 for(int i = 0; i < NUM_DATA_POINTS; i++)
 			 frenchData[0][i] = getValue(valueScan.next());
+		 valueScan.close();
 		 
 		 line = lineScan.nextLine();
 		 valueScan = new Scanner(line);
 		 valueScan.next();
 		 for(int i = 0; i < NUM_DATA_POINTS; i++)
 			 frenchData[1][i] = getValue(valueScan.next());
+		 valueScan.close();
 		 
 		 line = lineScan.nextLine();
 		 valueScan = new Scanner(line);
 		 valueScan.next();
 		 for(int i = 0; i < NUM_DATA_POINTS; i++)
 			 englishData[0][i] = getValue(valueScan.next());
+		 valueScan.close();
 		 
 		 line = lineScan.nextLine();
 		 valueScan = new Scanner(line);
@@ -80,52 +83,84 @@ public class LogisticRegression {
 	}
 	
 	public static double logistic(double[] x, double[] w) {
-		double beta = -1000;
-		return (1.0/(1+Math.pow(Math.E,beta*(dot(x,w))))); 	/*"-z" or "-w(dot)x" is represented here by (w[0]+w[1]*x-y). 
-															 * The sign is reversed because 0 should correspond to french which lies on top of the dividing line				
-		 													*/
+		return (1.0/(1+Math.pow(Math.E,-(dot(x,w)))));
+	}
+	
+	public static double gradient(double[][] frenchData, double[][] englishData, double[] w) {
+		double averageGradient=0;
+		double squareSums = 0;
+		for(int i = 0; i < frenchData[0].length; i++) {
+			squareSums = 0;
+			double[] x = {1, frenchData[0][i], frenchData[1][i]};
+			for(int j = 0; j < w.length; j++) {
+				squareSums += Math.pow((0 - logistic(x, w))*x[j], 2);
+			}
+			averageGradient += Math.sqrt(squareSums);
+			
+		}
+		
+		for(int i = 0; i < englishData[0].length; i++) {
+			squareSums = 0;
+			double[] x = {1, englishData[0][i], englishData[1][i]};
+			for(int j = 0; j < w.length; j++) {
+				squareSums += Math.pow((1 - logistic(x, w))*x[j], 2);
+			}
+			averageGradient += Math.sqrt(squareSums);
+		}
+		
+		return averageGradient /= (NUM_DATA_POINTS*2);
+		
+		
 	}
 	
 	public static void main(String[] args) {
+		System.out.println("Working...");
+		
+		final double alpha = .3;		//alpha value
+		final double maxGradient = .46;	//minimum gradient to continue the gradient ascent process
+
 		double[][] frenchData = new double[2][NUM_DATA_POINTS];
 		double[][] englishData= new double[2][NUM_DATA_POINTS];
 		
-		double[] w = {0,0,0};
-		final double alpha = .01;
-		final double epsilon = 1;
-		double loss = 10;
-		final double iterations = 10000;
 		
-		getInput(frenchData, englishData);
-		scaleData(frenchData, englishData, 100000, 100000);
+		getInput(frenchData, englishData);					//gathers input from file at INPUT_FILENAME
+		scaleData(frenchData, englishData, 100000, 100000);	//scales the data to fit in 0..1
 		
-		Random gen = new Random();
-		int count = 0;
-		while(count < iterations) {
-			
-			int language = gen.nextInt(2); //0 for french, 1 for english
-			double[][] dataSet = (language == 0)? frenchData: englishData;
-//			System.out.print(language +"| ");
-			int dataPoint = gen.nextInt(NUM_DATA_POINTS);
-					
-			// Calculates average loss for all points
-			double prevLoss = loss;
-			loss = 0;
+		double[] w = {0, .1, -1};	// contains the weights of the dividing surface
 		
+		double gradient = Integer.MAX_VALUE;		//current gradient in the gradient ascent process
+		
+		Random gen = new Random();	//generates the random dataPoint to compare
+		
+		int language;				// 0 = French, 1 = English
+		double[][] dataSet;			// either frenchData or englishData
+		int dataPoint;				// 0..NUM_DATA_POINTS
+		double[] x = new double[3];	// holds the randomly chosen data point in vector form
+		
+		while( gradient > maxGradient) {
+				
+			//random selection of a data point
+			language = gen.nextInt(2); //0 for french, 1 for english
+			dataSet = (language == 0)? frenchData: englishData;
+			dataPoint = gen.nextInt(NUM_DATA_POINTS);		
 
-			double[] x = {1, dataSet[0][dataPoint], dataSet[1][dataPoint]};
-			double change = 0;
+			//setting x vector to hold the point
+			x[0] = 1;
+			x[1] = dataSet[0][dataPoint];
+			x[2] = dataSet[1][dataPoint];
+			//= {1, dataSet[0][dataPoint], dataSet[1][dataPoint]};
 			
+			//adjusting dividing surface's weights
 			for(int i = 0; i < w.length; i++) {
-				change = logistic(x, w);
-				w[i] += alpha*(language-change)*x[i];
+				w[i] +=  alpha*(language - logistic(x, w))*x[i];
 			}
-
 			
-			//System.out.println("loss diff: " + (loss - prevLoss));
-			
-			count++;
+			//checking gradient
+			gradient = gradient(frenchData, englishData, w);
 		}
+		
 		System.out.println("w = [" + w[0] + ", " + w[1] + ", " + w[2] + "]");
+		System.out.println("or...  y = " + -w[0]/w[2] + " + " + -w[1]/w[2] + "x");
+
 	}
 }
