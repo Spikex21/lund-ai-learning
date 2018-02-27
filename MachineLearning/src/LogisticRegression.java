@@ -36,35 +36,26 @@ public class LogisticRegression {
 		}
 		String line;
 		Scanner valueScan;
+		int[] inputCounts = new int[2];
 		
-		 line = lineScan.nextLine();
-		 valueScan = new Scanner(line);
-		 valueScan.next();
-		 for(int i = 0; i < NUM_DATA_POINTS; i++)
-			 frenchData[0][i] = getValue(valueScan.next());
-		 valueScan.close();
-		 
-		 line = lineScan.nextLine();
-		 valueScan = new Scanner(line);
-		 valueScan.next();
-		 for(int i = 0; i < NUM_DATA_POINTS; i++)
-			 frenchData[1][i] = getValue(valueScan.next());
-		 valueScan.close();
-		 
-		 line = lineScan.nextLine();
-		 valueScan = new Scanner(line);
-		 valueScan.next();
-		 for(int i = 0; i < NUM_DATA_POINTS; i++)
-			 englishData[0][i] = getValue(valueScan.next());
-		 valueScan.close();
-		 
-		 line = lineScan.nextLine();
-		 valueScan = new Scanner(line);
-		 valueScan.next();
-		 for(int i = 0; i < NUM_DATA_POINTS; i++)
-			 englishData[1][i] = getValue(valueScan.next());
-		 valueScan.close();
-		 lineScan.close();
+		while(lineScan.hasNextLine() && (inputCounts[0] < NUM_DATA_POINTS || inputCounts[1] < NUM_DATA_POINTS)){
+			line = lineScan.nextLine();
+			valueScan = new Scanner(line);
+			int lang = Integer.parseInt(valueScan.next());
+			if(inputCounts[lang] >= NUM_DATA_POINTS) {
+				valueScan.close();
+				lineScan.close();
+				throw new IllegalArgumentException("number of data points exceeded for class " + lang);
+			}
+			
+			double[][] inputData = (lang == 0)? frenchData : englishData;
+			inputData[0][inputCounts[lang]] = getValue(valueScan.next());
+			inputData[1][inputCounts[lang]] = getValue(valueScan.next());
+			inputCounts[lang]++;
+			valueScan.close();
+		}
+		lineScan.close();
+	 
 	}
 	
 	public static void scaleData(double[][] frenchData, double[][] englishData, double scaleLetters, double scaleAs) {

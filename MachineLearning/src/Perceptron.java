@@ -20,31 +20,26 @@ public class Perceptron {
 		}
 		String line;
 		Scanner valueScan;
+		int[] inputCounts = new int[2];
 		
-		 line = lineScan.nextLine();
-		 valueScan = new Scanner(line);
-		 valueScan.next();
-		 for(int i = 0; i < NUM_DATA_POINTS; i++)
-			 frenchData[0][i] = getValue(valueScan.next());
-		 
-		 line = lineScan.nextLine();
-		 valueScan = new Scanner(line);
-		 valueScan.next();
-		 for(int i = 0; i < NUM_DATA_POINTS; i++)
-			 frenchData[1][i] = getValue(valueScan.next());
-		 
-		 line = lineScan.nextLine();
-		 valueScan = new Scanner(line);
-		 valueScan.next();
-		 for(int i = 0; i < NUM_DATA_POINTS; i++)
-			 englishData[0][i] = getValue(valueScan.next());
-		 
-		 line = lineScan.nextLine();
-		 valueScan = new Scanner(line);
-		 valueScan.next();
-		 for(int i = 0; i < NUM_DATA_POINTS; i++)
-			 englishData[1][i] = getValue(valueScan.next());
-		 
+		while(lineScan.hasNextLine() && (inputCounts[0] < NUM_DATA_POINTS || inputCounts[1] < NUM_DATA_POINTS)){
+			line = lineScan.nextLine();
+			valueScan = new Scanner(line);
+			int lang = Integer.parseInt(valueScan.next());
+			if(inputCounts[lang] >= NUM_DATA_POINTS) {
+				valueScan.close();
+				lineScan.close();
+				throw new IllegalArgumentException("number of data points exceeded for class " + lang);
+			}
+			
+			double[][] inputData = (lang == 0)? frenchData : englishData;
+			inputData[0][inputCounts[lang]] = getValue(valueScan.next());
+			inputData[1][inputCounts[lang]] = getValue(valueScan.next());
+			inputCounts[lang]++;
+			valueScan.close();
+		}
+		lineScan.close();
+	 
 	}
 	
 	public static void scaleData(double[][] frenchData, double[][] englishData) {
@@ -82,11 +77,13 @@ public class Perceptron {
 		getInput(frenchData, englishData);
 		scaleData(frenchData, englishData);
 		
+		double alpha = 1;
+		
+		/* Sets stop condition based off number of misclassified examples */
 		int numMisclassified = -1;
 		int count = 0;
 		int maxCount = 1000;
-		int maxMisclassified = 5;
-		double alpha = 1;
+		int maxMisclassified = 1;
 		
 		do {
 			int language = gen.nextInt(2); //0 for french, 1 for english
@@ -97,40 +94,29 @@ public class Perceptron {
 			int thresholdVal = threshold(x, y, w);
 			
 			if (count == maxCount) {
-				//System.out.println("num: " + numMisclassified + "  |   w = [" + w[0] + ", " + w[1] + ", " + w[2] + "]");
 				count = 0;
 				numMisclassified = 0;
 			}
 			
 			if (language - thresholdVal != 0) {
 				
-				// ********************
 				w[0] += alpha * (-language + thresholdVal);
 				w[1] += alpha * (-language + thresholdVal) * x;
 				w[2] += alpha * (-language + thresholdVal) * y;
-				// ********************
-
 				numMisclassified++;
-				//System.out.println(language - thresholdVal);
 			} 					
 			
 			count++;
 			
 		} while (numMisclassified > maxMisclassified || count < maxCount);
 		
-		int n = 0;
-		for (int i = 0; i < 15; i++) {
-			if (w[0] + frenchData[0][i] * w[1] + frenchData[1][i] * w[2] < 0) {
-				n++;
-			}
-			
-			if (w[0] + englishData[0][i] * w[1] + englishData[1][i] * w[2] >= 0) {
-				n++;
-			}
-		}
-				
-		System.out.println("n = " + n);
-		
 		System.out.println("w = [" + w[0] + ", " + w[1] + ", " + w[2] + "]");
+		
+		if (w[0] == 0) {
+			System.out.println("or... y = " + w[0]/w[2] + " + " + -w[1]/w[2] + "x");
+		} else {
+			System.out.println("or... y = " + -w[0]/w[2] + " + " + -w[1]/w[2] + "x");		
+		}
+		
 	}
 }
